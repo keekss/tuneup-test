@@ -20,5 +20,13 @@
                 "formulahendry.auto-close-tag"
             ]
         }
-    }
+    },
+    // Express
+    "portsAttributes": {
+        "3000": {
+        "label": "Application",
+        "onAutoForward": "openPreview"
+        }
+    },
+    "forwardPorts": [3000]
 }
