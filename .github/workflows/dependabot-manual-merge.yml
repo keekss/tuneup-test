@@ -1,0 +1,39 @@
+name: Manual Merge Dependabot PRs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  manual-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Merge Dependabot PRs
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo
+
+            const prs = await github.pulls.list({
+              owner,
+              repo,
+              state: 'open'
+            })
+
+            for (const pr of prs.data) {
+              if (pr.user.login === 'dependabot[bot]') {
+                try {
+                  await github.pulls.merge({
+                    owner,
+                    repo,
+                    pull_number: pr.number
+                  })
+                  console.log(`Merged PR #${pr.number}`)
+                } catch (error) {
+                  console.log(`Failed to merge PR #${pr.number}: ${error.message}`)
+                }
+              }
+            }
