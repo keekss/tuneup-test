@@ -1,0 +1,84 @@
+name: Auto Merge Dependabot PRs and Delete Old Branches
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+  workflow_dispatch: {}
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Auto merge
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // This workflow automatically merges Dependabot PRs and deletes old branches.
+            // It listens for pull_request_target events of types 'opened', 'synchronize', and 'reopened'.
+            // It also allows manual triggering through workflow_dispatch.
+
+            const { owner, repo } = context.repo
+
+            // Retrieve all open pull requests
+            const prs = await github.pulls.list({
+              owner,
+              repo,
+              state: 'open'
+            })
+
+            // Iterate through each pull request
+            for (const pr of prs.data) {
+              // Check if the pull request is from Dependabot
+              if (pr.user.login === 'dependabot[bot]') {
+                try {
+                  // Merge the pull request
+                  await github.pulls.merge({
+                    owner,
+                    repo,
+                    pull_number: pr.number
+                  })
+                  console.log(`Merged PR #${pr.number}`)
+
+                  // Delete the branch associated with the pull request
+                  await github.git.deleteRef({
+                    owner,
+                    repo,
+                    ref: `heads/${pr.head.ref}`
+                  })
+                  console.log(`Deleted branch ${pr.head.ref}`)
+                } catch (error) {
+                  console.log(`Failed to merge and delete branch for PR #${pr.number}: ${error.message}`)
+                }
+              }
+            }
+
+            // Retrieve all branches in the repository
+            const branches = await github.repos.listBranches({
+              owner,
+              repo
+            })
+
+            // Iterate through each branch
+            for (const branch of branches.data) {
+              // Check if the branch is an old Dependabot branch
+              if (branch.name.startsWith('dependabot/')) {
+                try {
+                  // Delete the old branch
+                  await github.git.deleteRef({
+                    owner,
+                    repo,
+                    ref: `heads/${branch.name}`
+                  })
+                  console.log(`Deleted old branch ${branch.name}`)
+                } catch (error) {
+                  console.log(`Failed to delete old branch ${branch.name}: ${error.message}`)
+                }
+              }
+            }
