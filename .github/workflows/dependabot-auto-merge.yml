@@ -30,27 +30,23 @@ jobs:
       
             for (const pr of prs.data) {
               if (pr.user.login === 'dependabot[bot]') {
-                // Check if the PR is for a dependency we want to auto-merge
-                const dependencyName = pr.title.split(' ')[1]
-                const autoMergeDependencies = ['dependency1', 'dependency2', 'dependency3']
-                if (autoMergeDependencies.includes(dependencyName)) {
-                  try {
-                    await github.pulls.merge({
-                      owner,
-                      repo,
-                      pull_number: pr.number
-                    })
-                    console.log(`Merged PR #${pr.number}`)
+                // Auto-merge Dependabot PR without checking dependency name
+                try {
+                  await github.pulls.merge({
+                    owner,
+                    repo,
+                    pull_number: pr.number
+                  })
+                  console.log(`Merged PR #${pr.number}`)
       
-                    await github.git.deleteRef({
-                      owner,
-                      repo,
-                      ref: `heads/${pr.head.ref}`
-                    })
-                    console.log(`Deleted branch ${pr.head.ref}`)
-                  } catch (error) {
-                    console.log(`Failed to merge and delete branch for PR #${pr.number}: ${error.message}`)
-                  }
+                  await github.git.deleteRef({
+                    owner,
+                    repo,
+                    ref: `heads/${pr.head.ref}`
+                  })
+                  console.log(`Deleted branch ${pr.head.ref}`)
+                } catch (error) {
+                  console.log(`Failed to merge and delete branch for PR #${pr.number}: ${error.message}`)
                 }
               }
             }
