@@ -9,8 +9,5 @@ ARG DEBIAN_FRONTEND=noninteractive
 COPY install-packages.sh /tmp/
 RUN chmod +x /tmp/install-packages.sh && /tmp/install-packages.sh
 
-# Clone your dotfiles repository
-RUN git clone https://github.com/keekss/dotfiles.git ~/dotfiles
-
 # Set the working directory
 WORKDIR /workspace
