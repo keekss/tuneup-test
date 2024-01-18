@@ -24,16 +24,16 @@ jobs:
             })
 
             for (const pr of prs.data) {
-              if (pr.user.login === 'dependabot[bot]') {
+              if (pr.user.login === 'dependabot[bot]' && pr.mergeable) {
                 try {
                   await github.pulls.merge({
                     owner,
                     repo,
                     pull_number: pr.number
                   })
-                  console.log(`Merged PR #${pr.number}`)
+                  console.log(`Merged PR #${pr.number}: ${pr.title}`)
                 } catch (error) {
-                  console.log(`Failed to merge PR #${pr.number}: ${error.message}`)
+                  console.error(`Failed to merge PR #${pr.number}: ${pr.title}. Error: ${error.message}`)
                 }
               }
             }

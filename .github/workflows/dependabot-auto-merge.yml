@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
-      - main  # Replace with your default branch if different
+      - main
 
 jobs:
   auto-merge:
@@ -19,22 +19,20 @@ jobs:
             const { owner, repo } = context.repo
             const pr = context.payload.pull_request
 
-            if (pr.user.login === 'dependabot[bot]') {
-              try {
-                await github.pulls.merge({
-                  owner,
-                  repo,
-                  pull_number: pr.number
-                })
-                console.log(`Merged PR #${pr.number}`)
+            try {
+              await github.pulls.merge({
+                owner,
+                repo,
+                pull_number: pr.number
+              })
+              console.log(`Merged PR #${pr.number}`)
 
-                await github.git.deleteRef({
-                  owner,
-                  repo,
-                  ref: `heads/${pr.head.ref}`
-                })
-                console.log(`Deleted branch ${pr.head.ref}`)
-              } catch (error) {
-                console.log(`Failed to merge and delete branch for PR #${pr.number}: ${error.message}`)
-              }
+              await github.git.deleteRef({
+                owner,
+                repo,
+                ref: `heads/${pr.head.ref}`
+              })
+              console.log(`Deleted branch ${pr.head.ref}`)
+            } catch (error) {
+              console.log(`Failed to merge and delete branch for PR #${pr.number}: ${error.message}`)
             }
