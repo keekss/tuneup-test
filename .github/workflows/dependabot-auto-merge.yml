@@ -14,5 +14,27 @@ jobs:
         uses: actions/checkout@v2
       - name: Auto merge
         uses: ahmadnassri/action-dependabot-auto-merge@v2
+        if: ${{ github.event_name == 'pull_request_target' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+  manual-merge:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Fetch open PRs from Dependabot
+        id: fetch-prs
+        run: |
+          PR_IDS=$(gh pr list --author dependabot[bot] --state open --json number --jq '.[].number')
+          echo "::set-output name=pr_ids::$PR_IDS"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Attempt to merge PRs
+        run: |
+          for PR_ID in ${{ steps.fetch-prs.outputs.pr_ids }}
+          do
+            gh pr merge $PR_ID --auto --merge
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
