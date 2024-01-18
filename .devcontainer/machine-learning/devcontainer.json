@@ -1,0 +1,29 @@
+{
+    "name": "Machine Learning",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    "containerEnv": {
+        "CODESPACE_ENV": "machine-learning",
+        "DEVCONTAINER_NAME": "Machine Learning"
+    },
+    "customizations":{
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+
+                // Jupyter
+                "ms-toolsai.jupyter",
+                "ms-toolsai.jupyter-renderers",
+                "ms-toolsai.jupyter-keymap",
+                "ms-toolsai.jupyter-notebook-renderers",
+                "ms-toolsai.jupyter-vscode-icons",
+                "ms-toolsai.jupyter-symbols",
+
+                // AI
+                "ms-toolsai.vscode-ai"
+            ]
+        }
+    }
+}

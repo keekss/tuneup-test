@@ -1,0 +1,11 @@
+{
+    "name": "Base",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    "containerEnv": {
+        "CODESPACE_ENV": "base",
+        "DEVCONTAINER_NAME": "Base"
+    }
+}

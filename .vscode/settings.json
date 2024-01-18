@@ -1,0 +1,16 @@
+{
+    "editor.wordWrap": "on",
+    "editor.lineNumbers": "on",
+
+    "explorer.confirmDragAndDrop": false,
+
+    "git.autofetch": true,
+    "git.enableSmartCommit": true,
+    "git.smartCommitChanges": "all",
+    
+    "workbench.colorTheme": "One Dark Pro Darker",
+
+    "terminal.integrated.allowChords": true,
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    
+}

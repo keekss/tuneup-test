@@ -1,0 +1,25 @@
+{
+    "recommendations": [
+        
+        // Linting / language support
+        "DavidAnson.vscode-markdownlint",
+        "timonwong.shellcheck",
+        "mikestead.dotenv",
+        "redhat.vscode-yaml",
+        
+        // Version control
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "GitHub.vscode-github-actions",
+        
+        // Development / workflow
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.vscode-remote-extensionpack",
+        
+        // Appearance
+        "zhuangtongfa.material-theme"
+    ]
+  }
+  

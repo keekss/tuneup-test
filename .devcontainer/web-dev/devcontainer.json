@@ -1,0 +1,24 @@
+{
+    "name": "Web Development",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    "containerEnv": {
+        "CODESPACE_ENV": "web-dev",
+        "DEVCONTAINER_NAME": "Web Development"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "leizongmin.node-module-intellisense",
+                "GoBystrokReactJS.gobystrok",
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "eamodio.gitlens",
+                "ritwickdey.LiveServer",
+                "formulahendry.auto-close-tag"
+            ]
+        }
+    }
+}
