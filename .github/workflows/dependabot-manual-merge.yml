@@ -17,7 +17,7 @@ jobs:
           script: |
             const { owner, repo } = context.repo
 
-            const prs = await github.pulls.list({
+            const prs = await github.rest.pulls.list({
               owner,
               repo,
               state: 'open'
@@ -26,7 +26,7 @@ jobs:
             for (const pr of prs.data) {
               if (pr.user.login === 'dependabot[bot]' && pr.mergeable) {
                 try {
-                  await github.pulls.merge({
+                  await github.rest.pulls.merge({
                     owner,
                     repo,
                     pull_number: pr.number
