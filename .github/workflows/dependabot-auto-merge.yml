@@ -35,7 +35,8 @@ jobs:
             echo "No open pull requests by Dependabot found."
             exit 0
           fi
-          for PR in "${PRs[@]}"
+          IFS=$'\n' read -rd '' -a prArray <<<"$PRs"
+          for PR in "${prArray[@]}"
           do
             gh pr merge "$PR" --auto --merge
           done
