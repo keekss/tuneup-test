@@ -1,36 +1,21 @@
-name: Dependabot auto-approve and merge
-on: 
-  pull_request:
-    types: [opened, synchronize, reopened]
-  workflow_dispatch:
+name: Dependabot auto-approve
+on: pull_request
 
 permissions:
-  contents: write
   pull-requests: write
 
 jobs:
-  auto-merge:
+  dependabot:
     runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Auto-merge Dependabot PRs
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Approve a PR
+        run: gh pr review --approve "$PR_URL"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          #!/bin/bash
-          set -e
-
-          echo "Fetching pull requests..."
-          PRS=$(gh pr list --search "is:open is:pr author:app/dependabot" -R ${{ github.repository }} --json number,title -q '.[].number')
-
-          for PR in $PRS; do
-              echo "Attempting to merge PR #$PR..."
-              # Directly merge the PR if all checks have passed
-              gh pr merge $PR --merge -R ${{ github.repository }} || echo "Failed to merge PR #$PR"
-          done
-
-      - name: Clean up
-        if: always()
-        run: echo "Workflow completed."
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
