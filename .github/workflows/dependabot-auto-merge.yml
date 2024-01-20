@@ -31,9 +31,11 @@ jobs:
       - name: Merge Dependabot PRs
         run: |
           PRs=$(gh pr list --limit 100 --state open --json number,author --jq '[.[] | select(.author.login == "dependabot[bot]") | .number]')
+          if [ -z "$PRs" ]; then
+            echo "No open pull requests by Dependabot found."
+            exit 0
+          fi
           for PR in "${PRs[@]}"
           do
             gh pr merge "$PR" --auto --merge
           done
-        env:
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
