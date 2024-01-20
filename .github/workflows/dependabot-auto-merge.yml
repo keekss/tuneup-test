@@ -1,5 +1,7 @@
-name: Dependabot auto-approve
-on: pull_request
+name: Dependabot auto-approve and merge
+on: 
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   pull-requests: write
@@ -7,7 +9,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
     steps:
       - name: Dependabot metadata
         id: metadata
@@ -18,4 +20,20 @@ jobs:
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  merge:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Merge Dependabot PRs
+        run: |
+          PRs=$(gh pr list --limit 100 --state open --json number,author --jq '[.[] | select(.author.login == "dependabot[bot]") | .number]')
+          for PR in "${PRs[@]}"
+          do
+            gh pr merge "$PR" --auto --merge
+          done
+        env:
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
