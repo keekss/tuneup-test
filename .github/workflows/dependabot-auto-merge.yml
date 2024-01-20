@@ -7,38 +7,27 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot:
+  auto-merge:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
     steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v1
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Approve a PR
-        run: gh pr review --approve "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-  merge:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Merge Dependabot PRs
-        run: |
-          PRs=$(gh pr list --limit 100 --state open --json number,author --jq '[.[] | select(.author.login == "dependabot[bot]") | .number]')
-          if [ -z "$PRs" ]; then
-            echo "No open pull requests by Dependabot found."
-            exit 0
-          fi
-          IFS=$'\n' read -rd '' -a prArray <<<"$PRs"
-          for PR in "${prArray[@]}"
-          do
-            gh pr merge "$PR" --auto --merge
-          done
+      - name: Auto-merge Dependabot PRs
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          #!/bin/bash
+          set -e
+
+          echo "Fetching pull requests..."
+          PRS=$(gh pr list --search "is:open is:pr author:app/dependabot" -R ${{ github.repository }} --json number,title -q '.[].number')
+
+          for PR in $PRS; do
+              echo "Merging PR #$PR..."
+              gh pr merge $PR --auto --merge -R ${{ github.repository }}
+          done
+
+      - name: Clean up
+        if: always()
+        run: echo "Workflow completed."
